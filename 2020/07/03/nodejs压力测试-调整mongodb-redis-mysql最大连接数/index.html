@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>nodejs压力测试(调整mongodb,redis,mysql最大连接数) | assasin&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="nodejs 压力测试(mongodb,redis最大连接数)[TOC] ##简单测试: siege  https:&#x2F;&#x2F;blog.csdn.net&#x2F;lshemail&#x2F;article&#x2F;details&#x2F;79298357 siege.js是一个面向程序员友好的测试工具，主要以测试http接口(或页面), 需要手动写测试代码. 没有可视化的客户端. 适用于初级测试. websocket-bench:htt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nodejs压力测试(调整mongodb,redis,mysql最大连接数)">
+<meta property="og:url" content="http://yoursite.com/2020/07/03/nodejs%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95-%E8%B0%83%E6%95%B4mongodb-redis-mysql%E6%9C%80%E5%A4%A7%E8%BF%9E%E6%8E%A5%E6%95%B0/index.html">
+<meta property="og:site_name" content="assasin&#39;s Blog">
+<meta property="og:description" content="nodejs 压力测试(mongodb,redis最大连接数)[TOC] ##简单测试: siege  https:&#x2F;&#x2F;blog.csdn.net&#x2F;lshemail&#x2F;article&#x2F;details&#x2F;79298357 siege.js是一个面向程序员友好的测试工具，主要以测试http接口(或页面), 需要手动写测试代码. 没有可视化的客户端. 适用于初级测试. websocket-bench:htt">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-07-03T09:33:50.000Z">
+<meta property="article:modified_time" content="2020-07-03T09:34:58.562Z">
+<meta property="article:author" content="assasin">
+<meta property="article:tag" content="PHP linux Python Javascript Html">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="assasin&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">assasin&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">不要迷恋哥,哥只是个传说</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-nodejs压力测试-调整mongodb-redis-mysql最大连接数" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/03/nodejs%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95-%E8%B0%83%E6%95%B4mongodb-redis-mysql%E6%9C%80%E5%A4%A7%E8%BF%9E%E6%8E%A5%E6%95%B0/" class="article-date">
+  <time datetime="2020-07-03T09:33:50.000Z" itemprop="datePublished">2020-07-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      nodejs压力测试(调整mongodb,redis,mysql最大连接数)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="nodejs-压力测试-mongodb-redis最大连接数"><a href="#nodejs-压力测试-mongodb-redis最大连接数" class="headerlink" title="nodejs 压力测试(mongodb,redis最大连接数)"></a>nodejs 压力测试(mongodb,redis最大连接数)</h1><p>[TOC]</p>
+<p>##简单测试:</p>
+<p><code>siege</code>  <a href="https://blog.csdn.net/lshemail/article/details/79298357" target="_blank" rel="noopener">https://blog.csdn.net/lshemail/article/details/79298357</a></p>
+<p>siege.js是一个面向程序员友好的测试工具，主要以测试http接口(或页面), 需要手动写测试代码. 没有可视化的客户端. 适用于初级测试.</p>
+<p><code>websocket-bench</code>:<a href="https://github.com/M6Web/websocket-bench" target="_blank" rel="noopener">https://github.com/M6Web/websocket-bench</a></p>
+<p>nodejs tool to benchmark socket.io and faye websocket server.</p>
+<p>websocket-benck是基于nodejs的工具. 主要用来测试websocket, 此工具三年前已暂停更新.</p>
+<p><code>JMeter</code>:<a href="https://jmeter.apache.org" target="_blank" rel="noopener">https://jmeter.apache.org</a></p>
+<p>是Apache基金会开源的100%纯JAVA桌面应用程序.被设计为用于测试客户端/服务端结构的软件(例如web应用程序)。它可以用来测试静态和动态资源的性能，例如：静态文件，Java Servlet,CGI Scripts,Java Object,数据库和FTP服务器等等。JMeter可用于模拟大量负载来测试一台服务器，网络或者对象的健壮性或者分析不同负载下的整体性能.</p>
+<p>jmeter需要有java环境支持.</p>
+<p><a href="https://www.jianshu.com/p/de29e4ff71d0" target="_blank" rel="noopener">Jmeter（一）工具的简单介绍</a></p>
+<h3 id="修改系统最大文件数和最大线程数-centos7-2"><a href="#修改系统最大文件数和最大线程数-centos7-2" class="headerlink" title="修改系统最大文件数和最大线程数(centos7.2)"></a>修改系统最大文件数和最大线程数(centos7.2)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">有时候进程数太小会导致卡死服务状态 而使用ulimit -u增加的线程不是永久添加的  这时候需要改配置文件使其永久添加。</span><br><span class="line">1，切换root权限</span><br><span class="line">2，vim &#x2F;etc&#x2F;security&#x2F;limits.conf   </span><br><span class="line"></span><br><span class="line"># End of file</span><br><span class="line">#root soft nofile 65535</span><br><span class="line">#root hard nofile 65535</span><br><span class="line">#* soft nofile 65535</span><br><span class="line">#* hard nofile 65535</span><br><span class="line">* soft noproc 127093</span><br><span class="line">* hard noproc 127093</span><br><span class="line">* soft nofile 127093</span><br><span class="line">* hard nofile 127093</span><br><span class="line"></span><br><span class="line">注释掉本来的配置 直接加新的就行  。</span><br><span class="line">3，vim &#x2F;etc&#x2F;security&#x2F;limits.d&#x2F;20-nproc.conf</span><br><span class="line"></span><br><span class="line">#*         soft    nproc     4096</span><br><span class="line">#root      soft    nproc     unlimited</span><br><span class="line">*          soft    nproc     127098</span><br><span class="line">*          hard    nproc     204800</span><br><span class="line"></span><br><span class="line">还是注掉原本存在的  直接加，然后重启  就会发现root和普通用户都是127098（自己设置）的线程。</span><br><span class="line">最大文件数同理  nofile代表最大文件数 </span><br><span class="line"></span><br><span class="line">--------------------- </span><br><span class="line">作者：BiuBiuBiu___ </span><br><span class="line">来源：CSDN </span><br><span class="line">原文：https:&#x2F;&#x2F;blog.csdn.net&#x2F;BiuBiuBiu___&#x2F;article&#x2F;details&#x2F;80169358 </span><br><span class="line">版权声明：本文为博主原创文章，转载请附上博文链接！</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="mongodb调整最大连接数-3-6"><a href="#mongodb调整最大连接数-3-6" class="headerlink" title="mongodb调整最大连接数(3.6)"></a>mongodb调整最大连接数(3.6)</h3><p>mongodb新版本中默认最大连接数是65536( <a href="https://docs.mongodb.com/manual/reference/configuration-options/#net.maxIncomingConnections" target="_blank" rel="noopener"><code>maxIncomingConnections</code></a> )</p>
+<p>控制台登录mongodb使用以下命令查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.serverStatus().connections;</span><br><span class="line">&#123; &quot;current&quot; : 1, &quot;available&quot; : 203, &quot;totalCreated&quot; : 1 &#125;</span><br><span class="line">最大连接数&#x3D;current数值+available数值</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="redis最大连接数"><a href="#redis最大连接数" class="headerlink" title="redis最大连接数"></a>redis最大连接数</h3><p>redis最大连接数默认是10000, 调整至30000</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;查看redis最大连接数, 需要先登录redis控制台</span><br><span class="line">&gt; config get maxclients</span><br><span class="line">1) &quot;maxclients&quot;</span><br><span class="line">2) &quot;10000&quot;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;查看redis当前连接数</span><br><span class="line">&gt;info Clients</span><br><span class="line"># Clients</span><br><span class="line">connected_clients:16</span><br><span class="line">client_longest_output_list:0</span><br><span class="line">client_biggest_input_buf:0</span><br><span class="line">blocked_clients:0</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;修改redis最大连接数</span><br><span class="line">临时修改:</span><br><span class="line">config set maxclients 10208</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;永久修改:</span><br><span class="line">vim &#x2F;etc&#x2F;redis.conf</span><br><span class="line">修改maxclients &#x3D; 30000</span><br><span class="line">修改并保存配置文件后重启redis</span><br></pre></td></tr></table></figure>
+
+<p><strong>遇到问题</strong></p>
+<p>修改ulimit -n和config文件后并不管用,需要修改systemctl目录中的<code>redis.server.d</code>下的配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;redis.service.d</span><br><span class="line">修改limit.conf文件中参数LimitNOFILE的值, 保存</span><br><span class="line">执行如下命令</span><br><span class="line"># systemctl daemon-reload</span><br><span class="line">&#x2F;&#x2F;重启redis</span><br><span class="line"># systemctl restart redis</span><br></pre></td></tr></table></figure>
+
+<p> 或者启动时手动指定配置文件或者指定最大连接数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-server &#x2F;etc&#x2F;redis.conf</span><br><span class="line">或者 redis-server --maxclients&#x3D;20000</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="mysql最大连接数"><a href="#mysql最大连接数" class="headerlink" title="mysql最大连接数"></a>mysql最大连接数</h3><p>查看mariadb最大连接数, 默认为151</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show variables like &#39;max_connections&#39;;</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| Variable_name   | Value |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| max_connections | 151   |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>配置/etc/my.conf, </p>
+<p>[mysqld]新添加一行如下参数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">max_connections&#x3D;10000</span><br></pre></td></tr></table></figure>
+
+<p>重启maradb服务后, 再次查看mariadb最大连接数, 并非是我们设置的10000</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [(none)]&gt; show variables like &#39;max_connections&#39;;</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| Variable_name   | Value |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| max_connections | 214   |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>这是由于mariadb有默认打开文件数限制。可以通过配置/usr/lib/systemd/system/mariadb.service来调大打开文件数目。</p>
+<p>配置/usr/lib/systemd/system/mariadb.service</p>
+<p>[Service]新添加两行如下参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LimitNOFILE&#x3D;20000</span><br><span class="line">LimitNPROC&#x3D;20000</span><br></pre></td></tr></table></figure>
+
+<p>重新加载服务器并重启mariadb</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl daemon-reload</span><br><span class="line"># systemctl restart mariadb</span><br></pre></td></tr></table></figure>
+
+
+
+<p>###可能影响</p>
+<p>Linux一般默认一个进程只有1024个文件描述符，需要通过ulimit修改</p>
+<p><a href="https://cnodejs.org/topic/5445caed9657d9ab12567e88" target="_blank" rel="noopener">https://cnodejs.org/topic/5445caed9657d9ab12567e88</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/03/nodejs%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95-%E8%B0%83%E6%95%B4mongodb-redis-mysql%E6%9C%80%E5%A4%A7%E8%BF%9E%E6%8E%A5%E6%95%B0/" data-id="ckc60v496000020tqf9qq4qir" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/07/03/%E5%88%A9%E7%94%A8tornado%E6%90%AD%E5%BB%BA%E6%96%87%E6%A1%A3%E9%A2%84%E8%A7%88%E7%B3%BB%E7%BB%9F/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">利用tornado搭建文档预览系统</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/03/nodejs%E5%8E%8B%E5%8A%9B%E6%B5%8B%E8%AF%95-%E8%B0%83%E6%95%B4mongodb-redis-mysql%E6%9C%80%E5%A4%A7%E8%BF%9E%E6%8E%A5%E6%95%B0/">nodejs压力测试(调整mongodb,redis,mysql最大连接数)</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/03/%E5%88%A9%E7%94%A8tornado%E6%90%AD%E5%BB%BA%E6%96%87%E6%A1%A3%E9%A2%84%E8%A7%88%E7%B3%BB%E7%BB%9F/">利用tornado搭建文档预览系统</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 assasin<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
